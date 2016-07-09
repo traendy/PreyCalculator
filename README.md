@@ -1,0 +1,2 @@
+# PreyCalculator
+Compilerbau.Konstantenfaltung
