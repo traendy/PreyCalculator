@@ -2,7 +2,7 @@
 
 int main () 
 {
-  int sum = 0 ;
+  int sum = 0+5 ;
   int num = 0 ;
   int x ;
   while ((x = readInt()) != 0) {

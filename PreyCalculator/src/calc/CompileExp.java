@@ -215,6 +215,7 @@ public class CompileExp implements Exp.Visitor<String, String>{
 			if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) && ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))) {
 			    outInt=(int) (d1-d2);
 			    changeAST();
+			    
 			}else if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) || ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))){
 				outDouble= d1-d2;
 				changeAST();

@@ -34,31 +34,31 @@ public class Main {
 			}
 			Yylex l = new Yylex(new FileReader(f));
 			
-			
 			@SuppressWarnings("deprecation")
 			parser p = new parser(l);
-				investParser(p);
-				CPP.Absyn.Program parse_tree;
+		
+				ConstantsManager.p = p;
+				
 				try {
-					parse_tree = p.pProgram();
+					ConstantsManager.parse_tree = ConstantsManager.p.pProgram();
 					
 					 System.out.println();
 				      System.out.println("Parse Succesful!");
 				      System.out.println();
 				      System.out.println("[Abstract Syntax]");
 				      System.out.println();
-				      System.out.println(PrettyPrinter.show(parse_tree));
+				      System.out.println(PrettyPrinter.show(ConstantsManager.parse_tree));
 				      System.out.println();
 				      System.out.println("[Linearized Tree]");
 				      System.out.println();
-				      System.out.println(PrettyPrinter.print(parse_tree));
+				      System.out.println(PrettyPrinter.print(ConstantsManager.parse_tree));
 				      
 				     // generate(parse_tree);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					System.out.println(e);
 				}
-				
+				investParser(ConstantsManager.p);
 		}catch(IOException e){
 			System.out.println(e.getMessage());
 		}
