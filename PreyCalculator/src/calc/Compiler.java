@@ -5,9 +5,9 @@ import CPP.Absyn.*;
 public class Compiler {
 	public static String eval(Exp e){
 		System.out.println("Eval Expression:");
-		String s =  e.accept(new CompileExp(), null);
+		 e.accept(new CompileExp(), null);
 		
-		return s ;
+		return "" ;
 	}
 	
 	public static void eval(Stm s){
@@ -19,8 +19,8 @@ public class Compiler {
 	
 	public static String eval(Arg a){
 		System.out.println("Eval Argument");
-		String s =  a.accept(new CompileArg(), null);
-		return s;
+		  a.accept(new CompileArg(), null);
+		return "";
 	}
 	
 	public static void eval(Def d){

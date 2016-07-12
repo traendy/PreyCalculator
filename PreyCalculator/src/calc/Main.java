@@ -58,17 +58,23 @@ public class Main {
 					// TODO Auto-generated catch block
 					System.out.println(e);
 				}
-				investParser(ConstantsManager.p);
+				investParser(ConstantsManager.parse_tree);
 		}catch(IOException e){
 			System.out.println(e.getMessage());
 		}
 
 	}
 	
-	private static void investParser(parser p) {
+	private static void investParser(Program parse_tree) {
 		System.out.println();
 		System.out.println("Production table:\n" );
 		System.out.println();
+		try {
+			Compiler.eval(parse_tree);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**

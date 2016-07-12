@@ -53,17 +53,13 @@ public class CompileExp implements Exp.Visitor<String, String>{
 	@Override
 	public String visit(EId p, String arg) {
 		System.out.println("Visit EId");
-		checkID();
 		
-		return "%"+p.id_+ " ";
+		
+		return "id:"+p.id_;
 	}
 
 	
-	private void checkID() {
-	/*
-	 * case is known and has a value change id in code with this value	
-	 */
-	}
+	
 
 	@Override
 	public String visit(EApp p, String arg) {
@@ -121,12 +117,30 @@ public class CompileExp implements Exp.Visitor<String, String>{
 		//return "%"+ (Module.level-1);
 	}
 
+	/*
+	 * Überarbeiten es soll der wert der varibalen aus dem constlist geholt werden 
+	 * dafür gibt es bereits eine funktion
+	 * es gibt also 4 fälle
+	 * beides sind variablen
+	 * eine ist variable eine ist const
+	 * eine ist cont eine ist var
+	 * und beide sind const
+	 * 
+	 * @see CPP.Absyn.Exp.Visitor#visit(CPP.Absyn.ETimes, java.lang.Object)
+	 */
 	@Override
 	public String visit(ETimes p, String arg) {
 		// TODO Auto-generated method stub
 		System.out.println("Visit ETimes");
 		String e1 = Compiler.eval(p.exp_1);
 		String e2 = Compiler.eval(p.exp_2);
+		double d=0.0f;
+		if(e1.contains("id")){
+			String str []= e1.split(":");
+			 d= ConstantsManager.findValue(str[1]);
+			 
+		}
+		
 		String out ="";
 		int outInt =0;
 		double outDouble= 0.0f;
@@ -182,9 +196,13 @@ public class CompileExp implements Exp.Visitor<String, String>{
 		String out ="";
 		int outInt =0;
 		double outDouble= 0.0f;
-		if(isNumber(e1)&& isNumber(e2)){
+		try{
+		if(isNumber(e1) && isNumber(e2)){
+		
 			double d1 = Double.parseDouble(e1);
 			double d2 = Double.parseDouble(e2);
+			
+			
 			if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) && ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))) {
 			    outInt=(int) (d1+d2);
 			    changeAST();
@@ -193,7 +211,9 @@ public class CompileExp implements Exp.Visitor<String, String>{
 				changeAST();
 			}
 		}
-		
+		}catch(Exception e){
+			
+		}
 		return "";
 		//return "%"+ (Module.level-1);
 	}

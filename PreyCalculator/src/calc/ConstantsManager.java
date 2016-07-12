@@ -46,4 +46,25 @@ public class ConstantsManager {
 		}
 		
 	}
+	
+	public static double findValue(String id){
+		int size = constList.size();
+		double tmp=0.0f;
+		boolean found = false;
+		for(int i=size; i>=0; i--){
+			if(constList.get(i).containsKey(id)){
+				tmp = Double.parseDouble(constList.get(i).get(id).trim());
+				System.out.println("---------------test output "+ tmp);
+				i=0;
+				found =true;
+			}
+		}
+		if(found){
+			return tmp;
+		}else{
+			System.out.println("This is not the variable you are looking for.");
+			System.exit(-1);
+			return 0;
+		}
+	}
 }
