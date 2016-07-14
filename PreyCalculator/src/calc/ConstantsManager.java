@@ -11,8 +11,10 @@ public class ConstantsManager {
 	 * e.g. int a = 8 -> <a:8>
 	 */
 	public static CPP.Absyn.Program parse_tree;
-	public static parser p;
+	public static CPP.Absyn.Program parse_tree_copy;
 	
+	public static parser p;
+	public static boolean isInTable=true;
 	public static LinkedList<HashMap<String, String>> constList = new LinkedList<>();
 	
 	
@@ -63,7 +65,7 @@ public class ConstantsManager {
 			return tmp;
 		}else{
 			System.out.println("This is not the variable you are looking for.");
-			System.exit(-1);
+			isInTable =false;
 			return 0;
 		}
 	}

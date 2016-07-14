@@ -1,5 +1,6 @@
 package calc;
 
+import CPP.parser;
 import CPP.Absyn.*;
 
 import java.util.LinkedList;
@@ -10,63 +11,65 @@ import java.util.LinkedList;
  * @author soenke
  *
  */
-public class CompileExp implements Exp.Visitor<String, String>{
+public class CompileExp implements Exp.Visitor<CPP.Absyn.Exp, String>{
 /**
  * Most of the functions are her always return the appended string that schould be it
  */
 	
 	
 	@Override
-	public String visit(ETrue p, String arg) {
+	public Exp visit(ETrue p, String arg) {
 		// TODO Auto-generated method stub		
-		System.out.println("Visit ETrue");		
-		return "1 ";
+		System.out.println("Visit ETrue");	
+		
+		java_cup.runtime.Symbol res = parser.class.parse();
+		return null;
 	}
 
 	@Override
-	public String visit(EFalse p, String arg) {		
+	public Exp visit(EFalse p, String arg) {		
 		System.out.println("Visit EFalse");		
-		return "0 ";
+		return null;
 	}
 
 	@Override
-	public String visit(EInt p, String arg) {
+	public Exp visit(EInt p, String arg) {
 		System.out.println("Visit EInt");	
-		return p.integer_.toString()+ " ";
+		return null;
 	}
 
 	@Override
-	public String visit(EDouble p, String arg) {
+	public Exp visit(EDouble p, String arg) {
 		System.out.println("Visit Double");
-		return (p.double_.toString()+" ");
+		return null;
 	}
 
 	@Override
-	public String visit(EString p, String arg) {
+	public Exp visit(EString p, String arg) {
 		// TODO Auto-generated method stub
 		
 		System.out.println("Visit EString");
 		
-		return p.string_ +" ";
+		return null;
 	}
 
 	@Override
-	public String visit(EId p, String arg) {
+	public Exp visit(EId p, String arg) {
 		System.out.println("Visit EId");
 		
 		
-		return "id:"+p.id_;
+		return null;
 	}
 
 	
 	
 
 	@Override
-	public String visit(EApp p, String arg) {
+	public Exp visit(EApp p, String arg) {
 		// TODO Auto-generated method stub
 		System.out.println("Visit EApp");
 		if(p.listexp_.size()==0){
-			return "call "+p.id_+"()";
+			return null;
 		
 		}else{
 			LinkedList<String> k= new LinkedList<>();
@@ -78,42 +81,42 @@ public class CompileExp implements Exp.Visitor<String, String>{
 				s+=" i32 "+ k.get(i)+",";
 			}
 			s+= "i32 "+ k.getLast();
-			String s2 ="call "+ p.id_+"( " + s + " )";
-			return s2;
+			String s2 ="fun: "+ p.id_+"( " + s + " )";
+			return null;
 		}
 		
 	}
 
 	@Override
-	public String visit(EPIncr p, String arg) {
+	public Exp visit(EPIncr p, String arg) {
 		
 		System.out.println("Visit EPIncr");
 		
 		
-		return "";
+		return null;
 		//return "%"+ (Module.level-1);
 	}
 
 	@Override
-	public String visit(EPDecr p, String arg) {
+	public Exp visit(EPDecr p, String arg) {
 		
 		System.out.println("Visit EPDecr");
-		return "";
+		return null;
 	}
 
 	@Override
-	public String visit(EIncr p, String arg) {
+	public Exp visit(EIncr p, String arg) {
 		System.out.println("Visit EIncr");
 	
 		//return "%"+ (Module.level-1);
-		return "";
+		return null;
 	}
 
 	@Override
-	public String visit(EDecr p, String arg) {
+	public Exp visit(EDecr p, String arg) {
 		System.out.println("Visit EDecr");
 	
-		return "";
+		return null;
 		//return "%"+ (Module.level-1);
 	}
 
@@ -129,34 +132,61 @@ public class CompileExp implements Exp.Visitor<String, String>{
 	 * @see CPP.Absyn.Exp.Visitor#visit(CPP.Absyn.ETimes, java.lang.Object)
 	 */
 	@Override
-	public String visit(ETimes p, String arg) {
+	public Exp visit(ETimes p, String arg) {
 		// TODO Auto-generated method stub
 		System.out.println("Visit ETimes");
 		String e1 = Compiler.eval(p.exp_1);
 		String e2 = Compiler.eval(p.exp_2);
-		double d=0.0f;
-		if(e1.contains("id")){
-			String str []= e1.split(":");
-			 d= ConstantsManager.findValue(str[1]);
-			 
-		}
-		
+		double d1=0.0f;
+		double d2=0.0f;
+		boolean isd1 = false;
+		boolean isd2 = false;
 		String out ="";
 		int outInt =0;
 		double outDouble= 0.0f;
-		if(isNumber(e1)&& isNumber(e2)){
-			double d1 = Double.parseDouble(e1);
-			double d2 = Double.parseDouble(e2);
-			if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) && ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))) {
-			    outInt=(int) (d1*d2);
-			    changeAST();
-			}else if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) || ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))){
-				outDouble= d1*d2;
-				changeAST();
-			}
+		//if(e1 instanceof EInt)
+		if(e1.contains("fun")|| e2.contains("fun")){
+			//dont change tree
+			return null;
+		}
+		if(ConstantsManager.findValue(e1.split(":")[1])==0 || ConstantsManager.findValue(e2.split(":")[1])==0){
+			if(!ConstantsManager.isInTable){
+				ConstantsManager.isInTable = true;
+				//dont change tree
+				return null;
+ 			}
+		}
+		if(e1.contains("id")){
+			String str []= e1.split(":");
+			 d1= ConstantsManager.findValue(str[1]);
+			 isd1=true;
+		}
+		if(e2.contains("id")){
+			String str []= e2.split(":");
+			 d2= ConstantsManager.findValue(str[1]);
+			 isd2=true;
+		}
+		//if both are known constants
+		if(isNumber(e1) && isNumber(e2)){
+			d1 = Double.parseDouble(e1);
+			d2 = Double.parseDouble(e2);
+			
+			// if the first is known constant the other is a number
+		}else if(isd1 && isNumber(e2)){
+			d2 = Double.parseDouble(e2);
+			//if the first is number the second one is known constatn
+		}else if(isd2 && isNumber(e1)){
+			d1 = Double.parseDouble(e1);
 		}
 		
-		return "";
+		if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) && ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))) {
+		    outInt=(int) (d1*d2);
+		    changeAST();
+		}else if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) || ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))){
+			outDouble= d1*d2;
+			changeAST();
+		}
+		return null;
 		//return "%"+ (Module.level-1);
 		
 	}
@@ -164,173 +194,268 @@ public class CompileExp implements Exp.Visitor<String, String>{
 	
 
 	@Override
-	public String visit(EDiv p, String arg) {
+	public Exp visit(EDiv p, String arg) {
 		// TODO Auto-generated method stub
 		String e1 = Compiler.eval(p.exp_1);
 		String e2 = Compiler.eval(p.exp_2);
+		double d1=0.0f;
+		double d2=0.0f;
+		boolean isd1 = false;
+		boolean isd2 = false;
 		String out ="";
 		int outInt =0;
 		double outDouble= 0.0f;
-		if(isNumber(e1)&& isNumber(e2)){
-			double d1 = Double.parseDouble(e1);
-			double d2 = Double.parseDouble(e2);
-			if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) && ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))) {
-			    outInt=(int) (d1/d2);
-			    changeAST();
-			}else if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) || ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))){
-				outDouble= d1/d2;
-				changeAST();
-			}
+		//if(e1 instanceof EInt)
+		if(e1.contains("fun")|| e2.contains("fun")){
+			//dont change tree
+			return null;
+		}
+		if(ConstantsManager.findValue(e1.split(":")[1])==0 || ConstantsManager.findValue(e2.split(":")[1])==0){
+			if(!ConstantsManager.isInTable){
+				ConstantsManager.isInTable = true;
+				//dont change tree
+				return null;
+ 			}
+		}
+		if(e1.contains("id")){
+			String str []= e1.split(":");
+			 d1= ConstantsManager.findValue(str[1]);
+			 isd1=true;
+		}
+		if(e2.contains("id")){
+			String str []= e2.split(":");
+			 d2= ConstantsManager.findValue(str[1]);
+			 isd2=true;
+		}
+		//if both are known constants
+		if(isNumber(e1) && isNumber(e2)){
+			d1 = Double.parseDouble(e1);
+			d2 = Double.parseDouble(e2);
+			
+			// if the first is known constant the other is a number
+		}else if(isd1 && isNumber(e2)){
+			d2 = Double.parseDouble(e2);
+			//if the first is number the second one is known constatn
+		}else if(isd2 && isNumber(e1)){
+			d1 = Double.parseDouble(e1);
 		}
 		
-		return "";
+		if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) && ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))) {
+		    outInt=(int) (d1*d2);
+		    changeAST();
+		}else if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) || ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))){
+			outDouble= d1*d2;
+			changeAST();
+		}
+		return null;
 		//return "%"+ (Module.level-1);
 	}
 
 	@Override
-	public String visit(EPlus p, String arg) {
+	public Exp visit(EPlus p, String arg) {
 		
 		System.out.println("Visit EPlus");
 		String e1 = Compiler.eval(p.exp_1);
 		String e2 = Compiler.eval(p.exp_2);
+		double d1=0.0f;
+		double d2=0.0f;
+		boolean isd1 = false;
+		boolean isd2 = false;
 		String out ="";
 		int outInt =0;
 		double outDouble= 0.0f;
-		try{
+		//if(e1 instanceof EInt)
+		if(e1.contains("fun")|| e2.contains("fun")){
+			//dont change tree
+			return null;
+		}
+		if(ConstantsManager.findValue(e1.split(":")[1])==0 || ConstantsManager.findValue(e2.split(":")[1])==0){
+			if(!ConstantsManager.isInTable){
+				ConstantsManager.isInTable = true;
+				//dont change tree
+				return null;
+ 			}
+		}
+		if(e1.contains("id")){
+			String str []= e1.split(":");
+			 d1= ConstantsManager.findValue(str[1]);
+			 isd1=true;
+		}
+		if(e2.contains("id")){
+			String str []= e2.split(":");
+			 d2= ConstantsManager.findValue(str[1]);
+			 isd2=true;
+		}
+		//if both are known constants
 		if(isNumber(e1) && isNumber(e2)){
+			d1 = Double.parseDouble(e1);
+			d2 = Double.parseDouble(e2);
+			
+			// if the first is known constant the other is a number
+		}else if(isd1 && isNumber(e2)){
+			d2 = Double.parseDouble(e2);
+			//if the first is number the second one is known constatn
+		}else if(isd2 && isNumber(e1)){
+			d1 = Double.parseDouble(e1);
+		}
 		
-			double d1 = Double.parseDouble(e1);
-			double d2 = Double.parseDouble(e2);
-			
-			
-			if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) && ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))) {
-			    outInt=(int) (d1+d2);
-			    changeAST();
-			}else if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) || ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))){
-				outDouble= d1+d2;
-				changeAST();
-			}
+		if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) && ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))) {
+		    outInt=(int) (d1*d2);
+		    changeAST();
+		}else if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) || ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))){
+			outDouble= d1*d2;
+			changeAST();
 		}
-		}catch(Exception e){
-			
-		}
-		return "";
+		return null;
 		//return "%"+ (Module.level-1);
 	}
 
 	@Override
-	public String visit(EMinus p, String arg) {
+	public Exp visit(EMinus p, String arg) {
 		// TODO Auto-generated method stub
 		
 		System.out.println("Visit EMinus");
 		
 		String e1 = Compiler.eval(p.exp_1);
 		String e2 = Compiler.eval(p.exp_2);
+		double d1=0.0f;
+		double d2=0.0f;
+		boolean isd1 = false;
+		boolean isd2 = false;
 		String out ="";
 		int outInt =0;
 		double outDouble= 0.0f;
-		if(isNumber(e1)&& isNumber(e2)){
-			double d1 = Double.parseDouble(e1);
-			double d2 = Double.parseDouble(e2);
-			if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) && ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))) {
-			    outInt=(int) (d1-d2);
-			    changeAST();
-			    
-			}else if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) || ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))){
-				outDouble= d1-d2;
-				changeAST();
-			}
+		//if(e1 instanceof EInt)
+		if(e1.contains("fun")|| e2.contains("fun")){
+			//dont change tree
+			return null;
+		}
+		if(ConstantsManager.findValue(e1.split(":")[1])==0 || ConstantsManager.findValue(e2.split(":")[1])==0){
+			if(!ConstantsManager.isInTable){
+				ConstantsManager.isInTable = true;
+				//dont change tree
+				return null;
+ 			}
+		}
+		if(e1.contains("id")){
+			String str []= e1.split(":");
+			 d1= ConstantsManager.findValue(str[1]);
+			 isd1=true;
+		}
+		if(e2.contains("id")){
+			String str []= e2.split(":");
+			 d2= ConstantsManager.findValue(str[1]);
+			 isd2=true;
+		}
+		//if both are known constants
+		if(isNumber(e1) && isNumber(e2)){
+			d1 = Double.parseDouble(e1);
+			d2 = Double.parseDouble(e2);
+			
+			// if the first is known constant the other is a number
+		}else if(isd1 && isNumber(e2)){
+			d2 = Double.parseDouble(e2);
+			//if the first is number the second one is known constatn
+		}else if(isd2 && isNumber(e1)){
+			d1 = Double.parseDouble(e1);
 		}
 		
-		return "";
+		if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) && ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))) {
+		    outInt=(int) (d1*d2);
+		    changeAST();
+		}else if (((d1 == Math.floor(d1)) && !Double.isInfinite(d1)) || ((d2 == Math.floor(d2)) && !Double.isInfinite(d2))){
+			outDouble= d1*d2;
+			changeAST();
+		}
+		return null;
 		//return "%"+ (Module.level-1);
 	}
 
 	@Override
-	public String visit(ELt p, String arg) {
+	public Exp visit(ELt p, String arg) {
 		
 		System.out.println("Visit ELt");
 		
-		return "";
+		return null;
 		//return "%"+ (Module.level-1);
 	}
 
 	@Override
-	public String visit(EGt p, String arg) {
+	public Exp visit(EGt p, String arg) {
 		// TODO Auto-generated method stub
 		
 		System.out.println("Visit EGt");
 		
-		return "";
+		return null;
 		//return "%"+ (Module.level-1);
 	
 	}
 
 	@Override
-	public String visit(ELtEq p, String arg) {
+	public Exp visit(ELtEq p, String arg) {
 		
 		System.out.println("Visit ELtEq");
 		
-		return "";
+		return null;
 		//return "%"+ (Module.level-1);
 	}
 
 	@Override
-	public String visit(EGtEq p, String arg) {
+	public Exp visit(EGtEq p, String arg) {
 		// TODO Auto-generated method stub
 		
 		System.out.println("Visit EGtEq");
 		
-		return "";
+		return null;
 		//return "%"+ (Module.level-1);
 	}
 
 	@Override
-	public String visit(EEq p, String arg) {
+	public Exp visit(EEq p, String arg) {
 		System.out.println("Visit EEq");
 		
-		return "";
+		return null;
 		//return "%"+ (Module.level-1);
 	}
 
 	@Override
-	public String visit(ENEq p, String arg) {
+	public Exp visit(ENEq p, String arg) {
 		System.out.println("Visit ENEq");
 		
-		return "";
+		return null;
 		//return "%"+ (Module.level-1);
 	}
 
 	@Override
-	public String visit(EAnd p, String arg) {
+	public Exp visit(EAnd p, String arg) {
 		// TODO Auto-generated method stub
 		System.out.println("Visit EAnd");
 	
-		return "";
+		return null;
 		//return "%"+ (Module.level-1);
 	}
 
 	@Override
-	public String visit(EOr p, String arg) {
+	public Exp visit(EOr p, String arg) {
 		System.out.println("Visit EOr");
 		
-		return "";
+		return null;
 		//return "%"+ (Module.level-1);
 	}
 
 	@Override
-	public String visit(EAss p, String arg) {
+	public Exp visit(EAss p, String arg) {
 		
 		System.out.println("Visit EAss");
 		/*
 		 * If value known set value not id
 		 */
-		return "";
+		return null;
 		//return "%"+ (Module.level-1);
 	}
 
 	@Override
-	public String visit(ETyped p, String arg) {
+	public Exp visit(ETyped p, String arg) {
 		
 		System.out.println("Visit ETyped");
 		return null;

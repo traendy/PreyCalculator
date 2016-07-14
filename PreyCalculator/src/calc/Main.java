@@ -41,7 +41,7 @@ public class Main {
 				
 				try {
 					ConstantsManager.parse_tree = ConstantsManager.p.pProgram();
-					
+					ConstantsManager.parse_tree_copy = ConstantsManager.p.pProgram();
 					 System.out.println();
 				      System.out.println("Parse Succesful!");
 				      System.out.println();
