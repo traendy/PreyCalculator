@@ -58,45 +58,32 @@ public class Main {
 					// TODO Auto-generated catch block
 					System.out.println(e);
 				}
-				investParser(ConstantsManager.parse_tree);
+				generate(ConstantsManager.parse_tree);
 		}catch(IOException e){
 			System.out.println(e.getMessage());
 		}
 
 	}
 	
-	private static void investParser(Program parse_tree) {
-		System.out.println();
-		System.out.println("Production table:\n" );
-		System.out.println();
-		try {
-			Compiler.eval(parse_tree);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * 
-	 * implemnt the functions
-	 * 			-read through the doc of llvm to find the correct string values for the functions
-	 * print the string in an existing file
-	 * make java to execute jasmin and with that text file
-	 * For any 
-	 * 
-	 * 
-	 * maybe it does make sense to do sysos in every visit and eval 
-	 * @param parse_tree
-	 */
 	
+
+	/*
+	 * This Funktion generates the new parse_tree and prints it to the standard output
+	 */
 	private static void generate(Program parse_tree) {
 		
 		
 		
 		
-		Compiler.eval(parse_tree);
-	
+		parse_tree = Acceptor.eval(parse_tree);
+		System.out.println();
+	      System.out.println("[Abstract Syntax]");
+	      System.out.println();
+	      System.out.println(PrettyPrinter.show(parse_tree));
+	      System.out.println();
+	      System.out.println("[Linearized Tree]");
+	      System.out.println();
+	      System.out.println(PrettyPrinter.print(parse_tree));
 		
 	}
 	

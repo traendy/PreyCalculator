@@ -51,22 +51,29 @@ public class ConstantsManager {
 	
 	public static double findValue(String id){
 		int size = constList.size();
+		
 		double tmp=0.0f;
-		boolean found = false;
-		for(int i=size; i>=0; i--){
+		
+		for(int i=size-1; i>=0; i--){
 			if(constList.get(i).containsKey(id)){
 				tmp = Double.parseDouble(constList.get(i).get(id).trim());
 				System.out.println("---------------test output "+ tmp);
 				i=0;
-				found =true;
+				isInTable =true;
 			}
 		}
-		if(found){
+		if(isInTable){
 			return tmp;
 		}else{
 			System.out.println("This is not the variable you are looking for.");
 			isInTable =false;
 			return 0;
+		}
+	}
+	public static void printList(){
+		System.out.println("List:");
+		for(int i = 0; i< constList.size(); i++){
+			System.out.println(constList.get(i).toString());
 		}
 	}
 }
